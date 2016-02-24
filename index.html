@@ -1,0 +1,784 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+
+
+
+.node {
+  cursor: pointer;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 20px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+#CreateNode {
+top:5%;
+right:10%;
+outline: none;
+}
+
+.modal
+{
+overflow: hidden;
+}
+
+
+.modal-dialog{
+margin-right: 0;
+margin-left: 0;
+}
+
+.li{
+margin: 0px;
+padding: 0px;
+}
+
+
+.fileUpload {
+    position: relative;
+    overflow: hidden;
+    margin: 0px;
+}
+.fileUpload input.upload {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+
+
+
+
+
+</style>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+<body>
+
+
+
+
+
+
+
+
+<!-- NODE GROUP MODAL -->
+<div class="container">
+<div class="modal" id="CreateNodeGroup">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Node Editor</h4>
+      </div>
+      <div class="modal-body">
+       <form>
+        <fieldset>
+        <label for="member_names">Prefix</label>
+        <input type="text" class="form-control" id = "member_names" placeholder="" style="max-width:250px;">
+        </fieldset>
+         <hr>
+        <label for="number_members">Number of Nodes</label>
+        <input type="text" class="form-control" id = "number_members" style="max-width:50px;">     
+  		<div style="padding-top:10px;"><label><input type="checkbox" id="series_checked" value="">Append Series?</label></div>       
+		<hr>
+       </form>
+  <label for="name update">Node Type (required)</label>
+  <select class="form-control" id="selgroup" style="max-width:250px;">
+    <option value="white">Unspecified</option>
+    <option value="blue">Experiment (Root)</option>
+    <option value="orange">Condition</option>
+    <option value="green">Biological Replicate</option>
+    <option value="pink">Technical Replicate</option>
+    <option value="gray">Fraction</option>
+  </select>
+      </div>
+      <div class="modal-footer">
+        <button id="group_close" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="group_save" type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+
+<!-- FILE NAME LIST MODAL -->
+<div class="container">
+<div class="modal" id="displayFileNames">
+<div class="modal-dialog">
+	<div class="modal-content">
+	<div class="modal-header">
+	<button type="button" class="btn btn-secondary" data-dismiss="modal" style="visibility:hidden;"></button>
+	</div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+<!-- NODE EDIT MODAL -->
+<div class="container">
+<div class="modal" id="EditNode" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Edit Node Properties</h4>
+      </div>
+      <div class="modal-body">
+       <form>
+        <fieldset>
+        <label for="name_field_edit">Name</label>
+        <input type="text" class="form-control" id = "name_field_edit" placeholder="Name" style="max-width:250px;">
+        
+        <label for="name update">Description</label>
+        <input type="text" class="form-control" id = "desc_field_edit" placeholder="Description (optional)" style="max-width:500px;">
+        </fieldset>
+       </form>
+   <label for="name update">Node Type (required)</label>
+  <select class="form-control" id="sel2" style="max-width:250px;">
+    <option value="white">Unspecified</option>
+    <option value="blue">Experiment (Root)</option>
+    <option value="orange">Condition</option>
+    <option value="green">Biological Replicate</option>
+    <option value="pink">Technical Replicate</option>
+    <option value="gray">Fraction</option>
+  </select>
+      </div>
+      <div class="modal-footer">
+        <button id="edit_close" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="edit_save" type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+
+<!-- MENU BAR BUTTONS -->
+<a href="" type="button" onclick="save_json()" class="btn btn-primary btn-sm" id="saveref" data-toggle="modal">Save</a>
+<div class="fileUpload btn btn-primary btn-sm"><span>Upload</span><input id="fileinput" type="file" class="upload" /></div>
+<button type="button" id="filenamegen" onclick="generateFileNames()" class="btn btn-primary btn-sm" data-toggle="modal">generate file names</button>
+
+
+
+
+
+<!-- DROP DOWN MENU ITEMS -->
+<div class="form-group col-xs-2">
+  <select class="form-control" id="sel1">
+    <option>Navigate Design</option>
+    <option>Edit Node</option>
+    <option>Create Node</option>
+    <option>Create Node Group</option>
+    <option>Delete Node</option>
+  </select>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+
+<script>
+setModalFocus(); //initialize the focus of the modals so that cursor blinks in first input box
+function setModalFocus(){
+	$('#CreateNodeGroup').on('shown.bs.modal', function () {$('#member_names').focus();})
+	$('#EditNode').on('shown.bs.modal', function () {$('#name_field_edit').focus();})
+}
+
+
+
+
+function readSingleFile(evt) {
+    //Retrieve the first (and only!) File from the FileList object
+    var f = evt.target.files[0]; 
+    if (f) {
+      var r = new FileReader();
+      r.onload = function(e) { 
+	      var contents = e.target.result;
+	      beginload(JSON.parse(contents));
+      }
+      r.readAsText(f);
+    } else { 
+      console.log("Failed to load file");
+    }
+  }
+  
+ document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
+  
+
+
+
+
+
+var colormap = {};
+colormap["Unspecified"] = "white";
+colormap["Experiment (Root)"] = "blue";
+colormap["Condition"] = "orange";
+colormap["Biological Replicate"] = "green";
+colormap["Technical Replicate"] = "pink";
+colormap["Fraction"] = "gray";
+begin("http://127.0.0.1:8000/test.json");
+
+
+
+
+
+var node_ids = {};
+var unique_counter = 0;
+var margin = {top: 20, right: screen.width, bottom: screen.height*.6 , left:200},
+    width = margin.right - margin.left,
+    height = margin.bottom - margin.top;
+
+var i = 0,
+    duration = 750,
+    root;
+
+var tree = d3.layout.tree()
+    .size([height, width]);
+
+var diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.right + margin.left)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+d3.select(self.frameElement).style("height", "800px");
+    
+    
+    
+    
+
+
+
+
+function collapse(d) {
+
+    if (d.children) {
+      d._children = d.children;
+      d._children.forEach(collapse);
+      d.children = null;
+    }
+  }
+
+
+function begin(fpath){
+d3.json(fpath, function(error, flare) {
+  if (error) throw error;
+  //get all unique ids and update unique_counter accordingly
+  root = flare;
+  root.x0 = height / 2;
+  root.y0 = 0;
+  loadAttributes(root);
+  root.children.forEach(collapse);
+  navigate_tree(root);
+  expand_tree(root);
+
+ 
+});
+}
+
+function beginload(contents){
+	d3.json(contents, function(json) {
+	  //get all unique ids and update unique_counter accordingly
+
+	  
+	  root = contents;
+	  root.x0 = height / 2;
+	  root.y0 = 0;
+	  loadAttributes(root);
+	  root.children.forEach(collapse);
+	  navigate_tree(root);
+	  expand_tree(root);
+
+	 
+	});
+	}
+
+
+
+function navigate_tree(source) {
+
+	
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse(),
+      links = tree.links(nodes);
+
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+  // Update the nodes…
+  var node = svg.selectAll("g.node")
+      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+  
+  // Enter any new nodes at the parent's previous position.
+  // this triggers the click event
+
+   var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+      .on("click", click)
+  
+	  
+  nodeEnter.append("circle")
+  	  .attr("id", function(d) { return "g"+d.id; }) //append id to circle so that I can access this element directly
+      .attr("r", 1e-6)
+      .style("fill", function(d) { return colormap[d.type]; })
+      .append("svg:title").text(function(d) { return d.description; });
+
+  nodeEnter.append("text")
+  	  .attr("id", function(d) { return "t"+d.id; }) //append id to text so that I can access this element directly
+  	  .attr("desc", function(d) { ""; }) //node description field
+      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+      .attr("dy", ".55em")
+      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+      .text(function(d) { return d.name; })
+      .style("fill-opacity", 1e-6);
+  
+  
+
+  // Transition nodes to their new position.
+  var nodeUpdate = node.transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+  nodeUpdate.select("circle")
+      .attr("r", 10.5)
+      .style("fill", function(d) { return colormap[d.type]; });
+
+  nodeUpdate.select("text")
+      .style("fill-opacity", 1);
+
+  // Transition exiting nodes to the parent's new position.
+  var nodeExit = node.exit().transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+      .remove();
+
+  nodeExit.select("circle")
+      .attr("r", 1e-6);
+
+  nodeExit.select("text")
+      .style("fill-opacity", 1e-6);
+
+  // Update the links…
+  var link = svg.selectAll("path.link")
+      .data(links, function(d) { return d.target.id; });
+
+  // Enter any new links at the parent's previous position.
+  link.enter().insert("path", "g")
+      .attr("class", "link")
+      .attr("d", function(d) {
+        var o = {x: source.x0, y: source.y0};
+        return diagonal({source: o, target: o});
+      });
+
+  // Transition links to their new position.
+  link.transition()
+      .duration(duration)
+      .attr("d", diagonal);
+
+  // Transition exiting nodes to the parent's new position.
+  link.exit().transition()
+      .duration(duration)
+      .attr("d", function(d) {
+        var o = {x: source.x, y: source.y};
+        return diagonal({source: o, target: o});
+      })
+      .remove();
+
+  // Stash the old positions for transition.
+  nodes.forEach(function(d) {
+    d.x0 = d.x;
+    d.y0 = d.y;
+  });
+}
+
+
+
+
+
+
+
+
+function setNodeColor(source){
+	  d3.select("#g"+source.id)
+      .attr("r", 10.5)
+      .style("fill", d3.select("#sel2").node().value);
+	  source.type = $("#sel2 option[value='"+d3.select("#sel2").node().value+"']").text();
+}
+
+
+
+
+
+function editTreeNode(source){
+	//first populate dialogue boxes
+	document.getElementById("name_field_edit").value = source.name;
+	document.getElementById("desc_field_edit").value = source.description;
+	$('#sel2 option:contains("' + source.type + '")').attr('selected', 'selected');
+
+	  $('#EditNode').modal('show');
+	  $("#edit_save").unbind().click(function(){  //unbind notation is very important
+		  var newname=$("#name_field_edit").val();
+	  	  var description = $("#desc_field_edit").val();
+	  
+		  $("#t"+source.id).text(newname);
+		  source.name = newname;
+		  source.description = description;
+		  source.children = source._children;
+		  setNodeColor(source);
+		});	  
+}
+
+
+
+//pop up a modal box for adding a group of nodes
+
+function createNodeGroup(source){
+  $('#CreateNodeGroup').modal('show');
+  var checked = $('#series_checked').prop('checked', true);
+  $("#group_save").unbind().click(function(){  //unbind notation is very important
+	  var groupname=$("#member_names").val();
+  	  var num_members = $("#number_members").val();
+  	  var cnt=""
+  	  for (j=0;j<num_members;j++){
+  	   if (checked){cnt=j+1;}
+  	   createTreeNode(source,groupname+cnt,$("#selgroup option[value='"+d3.select("#selgroup").node().value+"']").text());
+  	   navigate_tree(source);
+  	  }
+	});	
+ 
+}
+
+
+
+function generateUniqueId(){
+    if ("g"+unique_counter in node_ids){
+    	node_ids[unique_counter] = "";
+    	unique_counter+=1;
+    }
+    return unique_counter;
+}
+
+
+
+
+
+
+function createTreeNode(source,name,type){
+	/**
+	When a new node is created it is crucial that the id is unique.  This ensures that although nodes may have the same name, 
+	they are always uniquely identifiable
+	**/
+	
+	var current_node = tree.nodes(source);
+	unique_counter++;
+	var myJSONObject = {"name": name,"children": [],"id":unique_counter,"type":type,"description":""};
+	node_ids[unique_counter] = "";
+	
+	if(current_node[0]._children!=null){
+	current_node[0]._children.push(myJSONObject);
+	source.children = source._children;
+	source._children = null;
+	}
+	
+	else if(current_node[0].children!=null && current_node[0]._children!=null){
+	current_node[0].children.push(myJSONObject);
+	}
+	
+	else{
+	if (typeof current_node[0].children == 'undefined')	
+	current_node[0].children=[];
+	current_node[0].children.push(myJSONObject);
+	}
+	
+	tree.links(current_node).push(current_node[current_node.length-1]);	
+    
+}
+
+
+
+
+
+
+
+function deleteTreeNode(source){
+	
+	if (typeof tree.nodes(source)[0].parent != 'undefined'){
+		var id = source.id;
+		var cntr=0;
+		var idx=0;
+		var current_id= 0;
+		for (child in tree.nodes(source)[0].parent.children){
+			current_id=tree.nodes(source)[0].parent.children[child].id
+			if (id==current_id){
+				idx = cntr;
+				break
+			}
+			cntr+=1;
+		}	
+		
+	tree.nodes(source)[0].parent.children.splice(idx,1);
+	tree.links(tree.nodes(source)).splice(idx,1);
+	delete node_ids[source.id];
+	}
+	//otherwise don't do anything since we're at the root
+}
+
+
+
+
+
+function toggle(d){
+	  if (d.children) {
+		    d._children = d.children;
+		    d.children = null;
+		  } else {
+		    d.children = d._children;
+		    d._children = null;
+		  }
+	return d
+}
+
+
+
+
+
+// Toggle children on click.
+function click(d) {
+
+	  
+	  toggle(d);
+	  
+      if(d3.select("#sel1").node().value=="Navigate Design"){
+	  navigate_tree(d);
+	  }
+	  
+	  if(d3.select("#sel1").node().value=="Edit Node"){
+	  editTreeNode(d);
+	  }
+	  
+	  if(d3.select("#sel1").node().value=="Create Node"){
+	  createTreeNode(d,"","Unspecified");
+	  navigate_tree(d);
+	  }
+
+	  if(d3.select("#sel1").node().value=="Delete Node"){
+	  deleteTreeNode(d);
+	  navigate_tree(d);
+      }
+	  
+	  if(d3.select("#sel1").node().value=="Create Node Group"){
+	  createNodeGroup(d);
+      }
+	  
+	 
+}
+
+
+
+
+
+//onclick methods
+function generateFileNames(){
+	/**
+	Iterate over nodes and traverse backwards from any leaf node
+	**/
+		d3.select("#displayFileNames").select("div").select("div").select("div").attr("style","overflow-y: scroll; height: 150px;").select("ul").remove(); //clear file list first
+		var dia = d3.select("#displayFileNames").select("div").select("div").select("div").append("ul");
+
+	
+	for (node in tree.nodes(root)){
+		if(typeof tree.nodes(root)[node].children == 'undefined'){
+        var leaf = tree.nodes(root)[node]; //this is a leaf node
+        var nodenames = [];
+        nodenames.push(leaf.name);
+       while (typeof leaf.parent != 'undefined'){
+    	    nodenames.push(leaf.parent.name);
+        	leaf = leaf.parent;
+        }
+       var filename = nodenames;
+        //populate the modal with file names
+		dia.append("li")
+	    .text(filename.reverse().join('_'));
+		}
+	}
+	$('#displayFileNames').modal('show');
+}
+
+
+
+function save_json(){
+	jsonstr="";
+	//save json string
+	print_json(root);
+	var file = new Blob([jsonstr],{type: 'text/html'});
+	var blobval = URL.createObjectURL(file);
+	$("#saveref").attr("href",blobval);
+	$("#saveref").attr("download","file.txt");
+}
+
+
+
+
+
+function retreive_children(current){
+	var allkids = [];
+	if (current._children){allkids = current._children;}
+	if (current.children){allkids = allkids.concat(current.children);}
+	return allkids;
+}
+
+
+
+
+function print_json(current){
+//attempt recursion through tree
+//get all children for current node
+current = toggle(current);
+var allkids = retreive_children(current);
+if (allkids){ //if current node has children, then prepare a new array entry
+	jsonstr+="{"+object2string(current,null)+",\"children\":[";
+	//iterate over children, adding each to the stack
+	for(var i=0;i<allkids.length;i++){
+		if(i>0)
+		jsonstr+=",";
+		print_json(allkids[i]);
+	}
+	jsonstr+="]}";
+}
+else{jsonstr+="{"+object2string(current,1)+"}";
+}
+}
+
+
+
+
+
+function loadAttributes(current){
+	//attempt recursion through tree
+	//get all children for current node
+	
+	if (parseInt(current.id)>unique_counter){
+		unique_counter=current.id;
+	}
+	node_ids[parseInt(current.id)] = "";
+	var allkids = retreive_children(current);
+	if (allkids){
+	for(var i=0;i<allkids.length;i++) loadAttributes(allkids[i]);
+	}
+}
+
+
+
+function expand_tree(current){
+	//make all nodes visible upon loading
+
+	
+	  if (current._children) {
+			    current.children = current._children;
+			    current._children = null;
+			    navigate_tree(current);
+			  }
+
+	var allkids = retreive_children(current);
+	if (allkids){
+	for(var i=0;i<allkids.length;i++){
+		expand_tree(allkids[i]);
+	}
+	}
+	}
+
+
+
+
+
+
+
+function object2string(o,type){
+	
+var objectstr = "";	
+for (a in o){
+	if(a!="children" && a!="_children" && a!="parent")
+	objectstr+="\""+a+"\": "+ "\""+o[a]+"\",";	
+}
+	objectstr = objectstr.substring(0,objectstr.length-1);
+		
+return objectstr
+}
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+</body>
