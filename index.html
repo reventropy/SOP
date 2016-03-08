@@ -79,6 +79,35 @@ padding: 0px;
 
 
 
+<nav class="navbar navbar-inverse">
+<ul class="nav navbar-nav nav-sm">
+<!-- DROP DOWN MENU ITEMS -->
+<li class="dropdown">
+
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="drop_main">Navigate Design
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu dropdown-inverse">
+     <li><a href="#">Navigate Design</a></li>
+   		 <li><a href="#">Edit Node</a></li>
+    		<li><a href="#">Create Node</a></li>
+    			<li><a href="#">Create Node Group</a></li>
+    				<li><a href="#">Delete Node</a></li>
+        </ul>
+      </li>
+<!-- MENU BAR BUTTONS -->
+<li>
+<a onclick="save_json()" id="saveref" data-toggle="modal" role="button">Download</a>
+</li> 
+<li>
+<a class="fileUpload">Upload<input id="fileinput" type="file" class="upload" /></a>
+</li>
+<li>
+<a id="filenamegen" onclick="generateFileNames()" data-toggle="modal" role="button">generate file names</a>
+</li>
+</ul>
+</nav>
+
+
 
 
 
@@ -157,7 +186,11 @@ padding: 0px;
         </button>
         <h4 class="modal-title" id="myModalLabel">Edit Node Properties</h4>
       </div>
-      <div class="modal-body">
+      
+      
+      
+      
+      <div class="modal-body" id="node_edit_body">
        <form>
         <fieldset>
         <label for="name_field_edit">Name</label>
@@ -167,6 +200,10 @@ padding: 0px;
         <input type="text" class="form-control" id = "desc_field_edit" placeholder="Description (optional)" style="max-width:500px;">
         </fieldset>
        </form>
+  
+  
+  
+       
    <label for="name update">Node Type (required)</label>
   <select class="form-control" id="sel2" style="max-width:250px;">
     <option value="white">Unspecified</option>
@@ -176,6 +213,9 @@ padding: 0px;
     <option value="pink">Technical Replicate</option>
     <option value="gray">Fraction</option>
   </select>
+  
+  
+  
       </div>
       <div class="modal-footer">
         <button id="edit_close" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -190,25 +230,13 @@ padding: 0px;
 
 
 
-<!-- MENU BAR BUTTONS -->
-<a href="" type="button" onclick="save_json()" class="btn btn-primary btn-sm" id="saveref" data-toggle="modal">Save</a>
-<div class="fileUpload btn btn-primary btn-sm"><span>Upload</span><input id="fileinput" type="file" class="upload" /></div>
-<button type="button" id="filenamegen" onclick="generateFileNames()" class="btn btn-primary btn-sm" data-toggle="modal">generate file names</button>
 
 
 
 
 
-<!-- DROP DOWN MENU ITEMS -->
-<div class="form-group col-xs-2">
-  <select class="form-control" id="sel1">
-    <option>Navigate Design</option>
-    <option>Edit Node</option>
-    <option>Create Node</option>
-    <option>Create Node Group</option>
-    <option>Delete Node</option>
-  </select>
-</div>
+
+
 
 
 
@@ -234,6 +262,13 @@ function setModalFocus(){
 	$('#CreateNodeGroup').on('shown.bs.modal', function () {$('#member_names').focus();})
 	$('#EditNode').on('shown.bs.modal', function () {$('#name_field_edit').focus();})
 }
+
+var dropDownText = "Navigate Design";
+$(".dropdown-inverse li a").click( function() {
+	    dropDownText = $(this).text();
+	    $("#drop_main").text(dropDownText);
+	    d3.select(".dropdown-toggle").append("span").attr("class","caret");
+	});
 
 
 
@@ -267,6 +302,15 @@ colormap["Condition"] = "orange";
 colormap["Biological Replicate"] = "green";
 colormap["Technical Replicate"] = "pink";
 colormap["Fraction"] = "gray";
+
+var exp_protocols = ['SILAC','TMT','IP','Pulldown(other)','Other'];
+var analysis_type = ['Timecourse','Dosecourse','Simple Treatment','SAINT (pulldown)','Other'];
+var pulldown_analysis_types = ['SPC','LFQ']
+
+
+
+
+
 begin("http://127.0.0.1:8000/test.json");
 
 
@@ -470,6 +514,14 @@ function editTreeNode(source){
 	document.getElementById("desc_field_edit").value = source.description;
 	$('#sel2 option:contains("' + source.type + '")').attr('selected', 'selected');
 
+	if (source.type=="Experiment (Root)"){
+		//Then add two more boxes to modal for Experimental Protocol and Experiment Type
+		var protocol_header = d3.select("#node_edit_body").append("label").text("Experimental Protocol");
+		var protocol_dropdown = protocol_header.append("select");
+		protocol_dropdown.attr("class","form-control").attr("style","max-width:250px;");
+	}
+	
+	
 	  $('#EditNode').modal('show');
 	  $("#edit_save").unbind().click(function(){  //unbind notation is very important
 		  var newname=$("#name_field_edit").val();
@@ -481,6 +533,11 @@ function editTreeNode(source){
 		  source.children = source._children;
 		  setNodeColor(source);
 		});	  
+	  
+	  
+	  
+	  
+	  
 }
 
 
@@ -600,28 +657,30 @@ function toggle(d){
 // Toggle children on click.
 function click(d) {
 
-	  
+	   
+	
+	
 	  toggle(d);
-	  
-      if(d3.select("#sel1").node().value=="Navigate Design"){
+
+      if(dropDownText=="Navigate Design"){
 	  navigate_tree(d);
 	  }
 	  
-	  if(d3.select("#sel1").node().value=="Edit Node"){
+	  if(dropDownText=="Edit Node"){
 	  editTreeNode(d);
 	  }
 	  
-	  if(d3.select("#sel1").node().value=="Create Node"){
+	  if(dropDownText=="Create Node"){
 	  createTreeNode(d,"","Unspecified");
 	  navigate_tree(d);
 	  }
 
-	  if(d3.select("#sel1").node().value=="Delete Node"){
+	  if(dropDownText=="Delete Node"){
 	  deleteTreeNode(d);
 	  navigate_tree(d);
       }
 	  
-	  if(d3.select("#sel1").node().value=="Create Node Group"){
+	  if(dropDownText=="Create Node Group"){
 	  createNodeGroup(d);
       }
 	  
